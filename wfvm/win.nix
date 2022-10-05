@@ -120,7 +120,7 @@ let
         7z x -y ${windowsIso} -owin
 
         # Split image so it fits in FAT32 partition
-        wimsplit win/sources/install.wim win/sources/install.swm 4090
+        wimsplit win/sources/install.wim win/sources/install.swm 4070
         rm win/sources/install.wim
 
         cp ${autounattend.autounattendXML} win/autounattend.xml

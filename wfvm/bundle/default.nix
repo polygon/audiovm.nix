@@ -1,6 +1,6 @@
 { pkgs }:
 
-pkgs.runCommandNoCC "win-bundle-installer.exe" {} ''
+pkgs.runCommand "win-bundle-installer.exe" {} ''
   mkdir bundle
   cd bundle
   cp ${./go.mod} go.mod

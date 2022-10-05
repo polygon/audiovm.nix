@@ -24,7 +24,7 @@ let
   });
 
   runQemuCommand = name: command: (
-    pkgs.runCommandNoCC name { buildInputs = [ p7zip utils.qemu libguestfs ]; }
+    pkgs.runCommand name { buildInputs = [ p7zip utils.qemu libguestfs ]; }
       (
         ''
           if ! test -f; then
@@ -138,12 +138,12 @@ let
       ''
   );
 
-  baseImage = pkgs.runCommandNoCC "RESTRICTDIST-windows.img" {} ''
+  baseImage = pkgs.runCommand "RESTRICTDIST-windows.img" {} ''
     ${installScript}
     mv c.img $out
   '';
 
-  finalImage = builtins.foldl' (acc: v: pkgs.runCommandNoCC "RESTRICTDIST-${v.name}.img" {
+  finalImage = builtins.foldl' (acc: v: pkgs.runCommand "RESTRICTDIST-${v.name}.img" {
     buildInputs = with utils; [
       qemu win-wait win-exec win-put
     ] ++ (v.buildInputs or []);

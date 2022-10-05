@@ -305,7 +305,7 @@ let
 
 in {
   # Lint and format as a sanity check
-  autounattendXML = pkgs.runCommandNoCC "autounattend.xml" {} ''
+  autounattendXML = pkgs.runCommand "autounattend.xml" {} ''
     ${pkgs.libxml2}/bin/xmllint --format ${autounattendXML} > $out
   '';
 

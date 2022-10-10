@@ -14,7 +14,7 @@
 let
   lib = pkgs.lib;
   utils = import ./utils.nix { inherit pkgs efi; };
-  libguestfs = pkgs.libguestfs-with-appliance;
+  inherit (pkgs) guestfs-tools;
 
   # p7zip on >20.03 has known vulns but we have no better option
   p7zip = pkgs.p7zip.overrideAttrs(old: {
@@ -24,7 +24,7 @@ let
   });
 
   runQemuCommand = name: command: (
-    pkgs.runCommand name { buildInputs = [ p7zip utils.qemu libguestfs ]; }
+    pkgs.runCommand name { buildInputs = [ p7zip utils.qemu guestfs-tools ]; }
       (
         ''
           if ! test -f; then
@@ -109,7 +109,7 @@ let
       ''
         #!${pkgs.runtimeShell}
         set -euxo pipefail
-        export PATH=${lib.makeBinPath [ p7zip utils.qemu libguestfs pkgs.wimlib ]}:$PATH
+        export PATH=${lib.makeBinPath [ p7zip utils.qemu guestfs-tools pkgs.wimlib ]}:$PATH
 
         # Create a bootable "USB" image
         # Booting in USB mode circumvents the "press any key to boot from cdrom" prompt

@@ -158,8 +158,9 @@ let
     ]);
 
   in ''
+    set -x
     # Create an image referencing the previous image in the chain
-    qemu-img create -f qcow2 -b ${acc} c.img
+    qemu-img create -F qcow2 -f qcow2 -b ${acc} c.img
 
     set -m
     qemu-system-x86_64 ${lib.concatStringsSep " " qemuParams} &

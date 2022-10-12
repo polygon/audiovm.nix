@@ -1,4 +1,4 @@
-{ pkgs, baseRtc ? "2020-04-20T14:21:42", cores ? "4", qemuMem ? "4G", efi ? true }:
+{ pkgs, baseRtc ? "2022-10-10T10:10:10", cores ? "4", qemuMem ? "4G", efi ? true }:
 
 rec {
   # qemu_test is a smaller closure only building for a single system arch

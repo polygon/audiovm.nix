@@ -36,8 +36,8 @@ let
   );
 
   windowsIso = if windowsImage != null then windowsImage else pkgs.requireFile rec {
-    name = "Win10_21H1_English_x64.iso";
-    sha256 = "1sl51lnx4r6ckh5fii7m2hi15zh8fh7cf7rjgjq9kacg8hwyh4b9";
+    name = "Win10_21H2_English_x64.iso";
+    sha256 = "0kr3m0bjy086whcbssagsshdxj6lffcz7wmvbh50zhrkxgq3hrbz";
     message = "Get ${name} from https://www.microsoft.com/en-us/software-download/windows10ISO";
   };
 

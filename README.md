@@ -52,3 +52,30 @@ Impure/pure mode
 Sometimes it can be useful to build the image _outside_ of the Nix sandbox for debugging purposes.
 
 For this purpose we have an attribute called `impureMode` which outputs the shell script used by Nix inside the sandbox to build the image.
+
+
+Usage with Nix Flakes
+---------------------
+
+Build the demo by running:
+```shell
+nix build .#demoImage
+```
+
+This project's **flake.nix** exposes its functions under `lib`. To use
+in your own project, setup your flake like this:
+
+```nix
+{
+  inputs = {
+    nixpkgs.url = "github:nixos/nixpkgs/nixos-unstable";
+    wfvm.url = "git+https://git.m-labs.hk/m-labs/wfvm";
+  };
+
+  outputs = { self, nixpkgs, wfvm }: {
+    packages."x86_64-linux".flaky-os = wfvm.lib.makeWindowsImage {
+      # configuration parameters go here
+    };
+  };
+}
+```

@@ -1,7 +1,17 @@
-{ pkgs ? import <nixpkgs> {}, impureMode ? false }:
+{ pkgs ? import <nixpkgs> {}
+# Whether to generate just a script to start and debug the windows installation
+, impureMode ? false
+# Flake input `self`
+, self ? null
+}:
 
 let
-  wfvm = (import ./default.nix { inherit pkgs; });
+  wfvm =
+    if self == null
+    # nix-build
+    then (import ./default.nix { inherit pkgs; })
+    # built from flake.nix
+    else self.lib;
 in
 wfvm.makeWindowsImage {
   # Build install script & skip building iso

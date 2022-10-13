@@ -16,5 +16,9 @@
       lib = import ./wfvm {
         inherit pkgs;
       };
+
+      packages.${system}.demoImage = import ./wfvm/demo-image.nix {
+        inherit self;
+      };
     };
 }

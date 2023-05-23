@@ -221,6 +221,7 @@ let
                 <PartitionID>3</PartitionID>
               </InstallTo>
               <InstallFrom>
+                <Path>\install.swm</Path>
                 <MetaData wcm:action="add">
                   <Key>/IMAGE/NAME</Key>
                   <Value>${imageSelection}</Value>

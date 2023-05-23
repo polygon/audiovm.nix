@@ -155,14 +155,10 @@ let
             </RunSynchronousCommand>
             <RunSynchronousCommand wcm:action="add">
               <Order>2</Order>
-              <Path>reg add HKLM\System\Setup\LabConfig /v BypassSecureBootCheck /t reg_dword /d 0x00000001 /f</Path>
-            </RunSynchronousCommand>
-            <RunSynchronousCommand wcm:action="add">
-              <Order>3</Order>
               <Path>reg add HKLM\System\Setup\LabConfig /v BypassRAMCheck /t reg_dword /d 0x00000001 /f</Path>
             </RunSynchronousCommand>
             <RunSynchronousCommand wcm:action="add">
-              <Order>5</Order>
+              <Order>3</Order>
               <Path>reg add HKLM\System\Setup\LabConfig /v BypassCPUCheck /t reg_dword /d 0x00000001 /f</Path>
             </RunSynchronousCommand>
             <RunSynchronousCommand wcm:action="add">

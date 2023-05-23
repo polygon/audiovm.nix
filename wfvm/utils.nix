@@ -4,18 +4,22 @@ rec {
   # qemu_test is a smaller closure only building for a single system arch
   qemu = pkgs.qemu;
 
+  OVMF = pkgs.OVMF.override {
+    secureBoot = true;
+  };
+
   mkQemuFlags = extraFlags: [
     "-enable-kvm"
     "-cpu host"
     "-smp ${cores}"
     "-m ${qemuMem}"
-    "-M q35"
+    "-M q35,smm=on"
     "-vga qxl"
     "-rtc base=${baseRtc}"
     "-device qemu-xhci"
     "-device virtio-net-pci,netdev=n1"
   ] ++ pkgs.lib.optionals efi [
-    "-bios ${pkgs.OVMF.fd}/FV/OVMF.fd"
+    "-bios ${OVMF.fd}/FV/OVMF.fd"
   ] ++ extraFlags;
 
   # Pass empty config file to prevent ssh from failing to create ~/.ssh

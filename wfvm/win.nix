@@ -41,10 +41,9 @@ let
     message = "Get ${name} from https://www.microsoft.com/en-us/software-download/windows10ISO";
   };
 
-  # stable as of 2021-04-08
   virtioWinIso = pkgs.fetchurl {
-    url = "https://fedorapeople.org/groups/virt/virtio-win/direct-downloads/archive-virtio/virtio-win-0.1.185-2/virtio-win-0.1.185.iso";
-    sha256 = "11n3kjyawiwacmi3jmfmn311g9xvfn6m0ccdwnjxw1brzb4kqaxg";
+    url = "https://fedorapeople.org/groups/virt/virtio-win/direct-downloads/archive-virtio/virtio-win-0.1.229-1/virtio-win.iso";
+    sha256 = "1q5vrcd70kya4nhlbpxmj7mwmwra1hm3x7w8rzkawpk06kg0v2n8";
   };
 
   openSshServerPackage = pkgs.fetchurl {

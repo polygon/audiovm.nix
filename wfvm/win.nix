@@ -6,7 +6,7 @@
 , installCommands ? []
 , users ? {}
 # autounattend always installs index 1, so this default is backward-compatible
-, imageSelection ? "Windows 10 Pro"
+, imageSelection ? "Windows 11 Pro N"
 , efi ? true
 , ...
 }@attrs:
@@ -36,9 +36,9 @@ let
   );
 
   windowsIso = if windowsImage != null then windowsImage else pkgs.requireFile rec {
-    name = "Win10_21H2_English_x64.iso";
-    sha256 = "0kr3m0bjy086whcbssagsshdxj6lffcz7wmvbh50zhrkxgq3hrbz";
-    message = "Get ${name} from https://www.microsoft.com/en-us/software-download/windows10ISO";
+    name = "Win11_22H2_English_x64v1.iso";
+    sha256 = "08mbppsm1naf73z8fjyqkf975nbls7xj9n4fq0yp802dv1rz3whd";
+    message = "Get disk image ${name} from https://www.microsoft.com/en-us/software-download/windows11/";
   };
 
   virtioWinIso = pkgs.fetchurl {

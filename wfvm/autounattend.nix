@@ -15,7 +15,7 @@
 , impureShellCommands ? []
 , driveLetter ? "D:"
 , efi ? true
-, imageSelection ? "Windows 10 Pro"
+, imageSelection ? "Windows 11 Pro N"
 , ...
 }:
 
@@ -299,7 +299,7 @@ let
         </component>
       </settings>
 
-       <cpi:offlineImage cpi:source="wim:c:/wim/windows-10/install.wim#${imageSelection}" xmlns:cpi="urn:schemas-microsoft-com:cpi" />
+       <cpi:offlineImage cpi:source="wim:c:/wim/windows-11/install.wim#${imageSelection}" xmlns:cpi="urn:schemas-microsoft-com:cpi" />
     </unattend>
   '';
 

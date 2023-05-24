@@ -58,18 +58,16 @@ let
   assertCommand = c: builtins.typeOf c == "string" || builtins.typeOf c == "set" && builtins.hasAttr "Path" c && builtins.hasAttr "Description" c;
 
   commands = builtins.map (x: assert assertCommand x; if builtins.typeOf x == "string" then { Path = x; Description = x; } else x) (
-    [
-      {
-        Path = "powershell.exe Set-ExecutionPolicy -Force Unrestricted";
-        Description = "Allow unsigned powershell scripts.";
-      }
-    ]
-    ++ [
-      {
-        Path = ''powershell.exe ${driveLetter}\win-bundle-installer.exe'';
-        Description = "Install any declared packages.";
-      }
-    ]
+    [ {
+      Path = "powershell.exe Set-ExecutionPolicy -Force Unrestricted";
+      Description = "Allow unsigned powershell scripts.";
+    } {
+      Path = ''powershell.exe ${driveLetter}\win-bundle-installer.exe'';
+      Description = "Install any declared packages.";
+    } {
+      Path = "net accounts /maxpwage:unlimited";
+      Description = "Disable forced password expiry.";
+    } ]
     ++ setupCommands
     ++ [
       {

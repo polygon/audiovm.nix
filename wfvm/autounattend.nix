@@ -14,7 +14,6 @@
 , services ? {}
 , impureShellCommands ? []
 , driveLetter ? "D:"
-, efi ? true
 , imageSelection ? "Windows 11 Pro N"
 , ...
 }:
@@ -121,8 +120,7 @@ let
   # Windows expects a flat list of users while we want to manage them as a set
   flatUsers = builtins.attrValues (builtins.mapAttrs (name: s: s // { inherit name; }) users);
 
-  diskId =
-    if efi then 2 else 1;
+  diskId = 2;
 
   autounattendXML = pkgs.writeText "autounattend.xml" ''
     <?xml version="1.0" encoding="utf-8"?>
@@ -172,12 +170,12 @@ let
               <CreatePartitions>
                 <CreatePartition wcm:action="add">
                   <Order>1</Order>
-                  <Type>${if efi then "EFI" else "Primary"}</Type>
+                  <Type>EFI</Type>
                   <Size>300</Size>
                 </CreatePartition>
                 <CreatePartition wcm:action="add">
                   <Order>2</Order>
-                  <Type>${if efi then "MSR" else "Primary"}</Type>
+                  <Type>MSR</Type>
                   <Size>16</Size>
                 </CreatePartition>
                 <CreatePartition wcm:action="add">
@@ -189,7 +187,7 @@ let
               <ModifyPartitions>
                 <ModifyPartition wcm:action="add">
                   <Order>1</Order>
-                  <Format>${if efi then "FAT32" else "NTFS"}</Format>
+                  <Format>FAT32</Format>
                   <Label>System</Label>
                   <PartitionID>1</PartitionID>
                 </ModifyPartition>

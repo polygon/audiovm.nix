@@ -7,13 +7,12 @@
 , users ? {}
 # autounattend always installs index 1, so this default is backward-compatible
 , imageSelection ? "Windows 11 Pro N"
-, efi ? true
 , ...
 }@attrs:
 
 let
   lib = pkgs.lib;
-  utils = import ./utils.nix { inherit pkgs efi; };
+  utils = import ./utils.nix { inherit pkgs; };
   inherit (pkgs) guestfs-tools;
 
   # p7zip on >20.03 has known vulns but we have no better option
@@ -95,7 +94,7 @@ let
         "usb-storage,drive=virtio-win"
         # USB boot
         "-drive"
-        "id=win-install,file=${if efi then "usb" else "cd"}image.img,if=none,format=raw,readonly=on,media=${if efi then "disk" else "cdrom"}"
+        "id=win-install,file=usbimage.img,if=none,format=raw,readonly=on,media=disk"
         "-device"
         "usb-storage,drive=win-install"
         # Output image
@@ -124,11 +123,7 @@ let
 
         cp ${autounattend.autounattendXML} win/autounattend.xml
 
-        ${if efi then ''
         virt-make-fs --partition --type=fat win/ usbimage.img
-        '' else ''
-        ${pkgs.cdrkit}/bin/mkisofs -iso-level 4 -l -R -udf -D -b boot/etfsboot.com -no-emul-boot -boot-load-size 8 -hide boot.catalog -eltorito-alt-boot -o cdimage.img win/
-        ''}
         rm -rf win
 
         # Qemu requires files to be rw

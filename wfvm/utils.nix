@@ -1,4 +1,4 @@
-{ pkgs, baseRtc ? "2022-10-10T10:10:10", cores ? "4", qemuMem ? "4G", efi ? true }:
+{ pkgs, baseRtc ? "2022-10-10T10:10:10", cores ? "4", qemuMem ? "4G" }:
 
 rec {
   # qemu_test is a smaller closure only building for a single system arch
@@ -18,7 +18,6 @@ rec {
     "-rtc base=${baseRtc}"
     "-device qemu-xhci"
     "-device virtio-net-pci,netdev=n1"
-  ] ++ pkgs.lib.optionals efi [
     "-bios ${OVMF.fd}/FV/OVMF.fd"
   ] ++ extraFlags;
 

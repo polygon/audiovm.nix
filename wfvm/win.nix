@@ -5,6 +5,7 @@
 , impureMode ? false
 , installCommands ? []
 , users ? {}
+, enableTpm ? true
 # autounattend always installs index 1, so this default is backward-compatible
 , imageSelection ? "Windows 11 Pro N"
 , ...
@@ -12,7 +13,7 @@
 
 let
   lib = pkgs.lib;
-  utils = import ./utils.nix { inherit pkgs; };
+  utils = import ./utils.nix { inherit pkgs enableTpm; };
   inherit (pkgs) guestfs-tools;
 
   # p7zip on >20.03 has known vulns but we have no better option
@@ -52,7 +53,7 @@ let
 
   autounattend = import ./autounattend.nix (
     attrs // {
-      inherit pkgs;
+      inherit pkgs enableTpm;
       users = users // {
         wfvm = {
           password = "1234";
@@ -126,6 +127,8 @@ let
         virt-make-fs --partition --type=fat win/ usbimage.img
         rm -rf win
 
+        ${utils.tpmStartCommands}
+
         # Qemu requires files to be rw
         qemu-img create -f qcow2 c.img ${diskImageSize}
         qemu-system-x86_64 ${lib.concatStringsSep " " qemuParams}
@@ -153,6 +156,8 @@ let
 
   in ''
     set -x
+    ${utils.tpmStartCommands}
+
     # Create an image referencing the previous image in the chain
     qemu-img create -F qcow2 -f qcow2 -b ${acc} c.img
 

@@ -1,4 +1,9 @@
-{ pkgs, baseRtc ? "2022-10-10T10:10:10", cores ? "4", qemuMem ? "4G" }:
+{ pkgs
+, baseRtc ? "2022-10-10T10:10:10"
+, cores ? "4"
+, qemuMem ? "4G"
+, enableTpm ? false
+}:
 
 rec {
   # qemu_test is a smaller closure only building for a single system arch
@@ -19,7 +24,18 @@ rec {
     "-device qemu-xhci"
     "-device virtio-net-pci,netdev=n1"
     "-bios ${OVMF.fd}/FV/OVMF.fd"
+  ] ++ pkgs.lib.optionals enableTpm [
+    "-chardev" "socket,id=chrtpm,path=tpm.sock"
+    "-tpmdev" "emulator,id=tpm0,chardev=chrtpm"
+    "-device" "tpm-tis,tpmdev=tpm0"
   ] ++ extraFlags;
+
+  tpmStartCommands = pkgs.lib.optionalString enableTpm ''
+    mkdir -p tpmstate
+    ${pkgs.swtpm}/bin/swtpm socket \
+      --tpmstate dir=tpmstate \
+      --ctrl type=unixio,path=tpm.sock &
+  '';
 
   # Pass empty config file to prevent ssh from failing to create ~/.ssh
   sshOpts = "-F /dev/null -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -o LogLevel=ERROR -o ConnectTimeout=1";
@@ -96,6 +112,7 @@ rec {
       ]);
     in pkgs.writeShellScriptBin "wfvm-run-${name}" ''
       set -e -m
+      ${tpmStartCommands}
       ${qemu}/bin/qemu-system-x86_64 ${pkgs.lib.concatStringsSep " " qemuParams} &
 
       ${win-wait}/bin/win-wait

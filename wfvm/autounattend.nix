@@ -15,6 +15,7 @@
 , impureShellCommands ? []
 , driveLetter ? "D:"
 , imageSelection ? "Windows 11 Pro N"
+, enableTpm
 , ...
 }:
 
@@ -146,12 +147,14 @@ let
           </DriverPaths>
         </component>
         <component name="Microsoft-Windows-Setup" processorArchitecture="amd64" publicKeyToken="31bf3856ad364e35" language="neutral" versionScope="nonSxS" xmlns:wcm="http://schemas.microsoft.com/WMIConfig/2002/State" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-          <RunSynchronous>
-            <RunSynchronousCommand wcm:action="add">
-              <Order>1</Order>
-              <Path>reg add HKLM\System\Setup\LabConfig /v BypassTPMCheck /t reg_dword /d 0x00000001 /f</Path>
-            </RunSynchronousCommand>
-          </RunSynchronous>
+          ${lib.optionalString (!enableTpm) ''
+            <RunSynchronous>
+              <RunSynchronousCommand wcm:action="add">
+                <Order>1</Order>
+                <Path>reg add HKLM\System\Setup\LabConfig /v BypassTPMCheck /t reg_dword /d 0x00000001 /f</Path>
+              </RunSynchronousCommand>
+            </RunSynchronous>
+          ''}
 
           <DiskConfiguration>
             <Disk wcm:action="add">

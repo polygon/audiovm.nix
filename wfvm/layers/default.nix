@@ -93,7 +93,7 @@ in
 
         outputHashAlgo = "sha256";
         outputHashMode = "recursive";
-        outputHash = "0ic3jvslp2y9v8yv9mfr2mafkvj2q5frmcyhmlbxj71si1x3kpag";
+        outputHash = "sha256-GoOKzln8DXVMx52jWGEjwkOFkpSW+wEffAVmBVugIyk=";
 
         phases = [ "buildPhase" ];
         buildInputs = [ download-vs ];

@@ -215,7 +215,7 @@ let
 
           <UserData>
             <ProductKey>
-              ${if productKey != null then "<Key>${productKey}</Key>" else ""}
+              ${if productKey != null then "<Key>${productKey}</Key>" else "<Key/>"}
               <WillShowUI>OnError</WillShowUI>
             </ProductKey>
             <AcceptEula>true</AcceptEula>

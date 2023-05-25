@@ -36,8 +36,8 @@ let
   );
 
   windowsIso = if windowsImage != null then windowsImage else pkgs.requireFile rec {
-    name = "Win11_22H2_English_x64v1.iso";
-    sha256 = "08mbppsm1naf73z8fjyqkf975nbls7xj9n4fq0yp802dv1rz3whd";
+    name = "Win11_22H2_English_x64v2.iso";
+    sha256 = "0xhhxy47yaf1jsfmskym5f65hljw8q0aqs70my86m402i6dsjnc0";
     message = "Get disk image ${name} from https://www.microsoft.com/en-us/software-download/windows11/";
   };
 

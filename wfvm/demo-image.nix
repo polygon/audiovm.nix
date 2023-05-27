@@ -57,7 +57,7 @@ wfvm.makeWindowsImage {
         disable-autolock
         disable-firewall
       ])
-      anaconda3 msys2 msvc msvc-ide-unbreak
+      anaconda3 msys2
     ];
 
   # services = {

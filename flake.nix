@@ -12,13 +12,26 @@
 
       pkgs = nixpkgs.legacyPackages.${system};
 
-    in {
+    in rec {
       lib = import ./wfvm {
         inherit pkgs;
       };
 
-      packages.${system}.demoImage = import ./wfvm/demo-image.nix {
-        inherit self;
+      packages.${system} = rec {
+        demoImage = import ./wfvm/demo-image.nix {
+          inherit self;
+        };
+
+        default = lib.utils.wfvm-run {
+          name = "demo";
+          image = demoImage;
+          script =
+            ''
+            echo "Windows booted. Press Enter to terminate VM."
+            read
+            '';
+          display = true;
+        };
       };
     };
 }

@@ -2,7 +2,7 @@
   description = "WFVM: Windows Functional Virtual Machine";
 
   inputs = {
-    nixpkgs.url = "github:nixos/nixpkgs/nixos-unstable";
+    nixpkgs.url = "github:NixOS/nixpkgs/nixos-23.05";
   };
 
   outputs = { self, nixpkgs }:

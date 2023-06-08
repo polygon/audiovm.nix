@@ -2,6 +2,7 @@
 , baseRtc ? "2022-10-10T10:10:10"
 , cores ? "4"
 , qemuMem ? "4G"
+, efi ? true
 , enableTpm ? false
 }:
 
@@ -23,6 +24,7 @@ rec {
     "-rtc base=${baseRtc}"
     "-device qemu-xhci"
     "-device virtio-net-pci,netdev=n1"
+  ] ++ pkgs.lib.optionals efi [
     "-bios ${OVMF.fd}/FV/OVMF.fd"
   ] ++ pkgs.lib.optionals enableTpm [
     "-chardev" "socket,id=chrtpm,path=tpm.sock"

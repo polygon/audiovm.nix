@@ -14,7 +14,7 @@
 
 let
   lib = pkgs.lib;
-  utils = import ./utils.nix { inherit pkgs efi enableTpm; };
+  utils = import ./utils.nix ({ inherit pkgs efi enableTpm; } // attrs);
   inherit (pkgs) guestfs-tools;
 
   # p7zip on >20.03 has known vulns but we have no better option

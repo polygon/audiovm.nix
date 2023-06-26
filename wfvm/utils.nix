@@ -4,6 +4,7 @@
 , qemuMem ? "4G"
 , efi ? true
 , enableTpm ? false
+, ...
 }:
 
 rec {

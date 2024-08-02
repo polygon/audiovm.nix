@@ -1,37 +1,31 @@
-{ pkgs
-, baseRtc ? "2022-10-10T10:10:10"
-, cores ? "4"
-, qemuMem ? "4G"
-, efi ? true
-, enableTpm ? false
-, ...
-}:
+{ pkgs, baseRtc ? "2022-10-10T10:10:10", cores ? "4", qemuMem ? "4G", efi ? true
+, enableTpm ? false, qemu ? pkgs.qemu, ... }:
 
 rec {
-  # qemu_test is a smaller closure only building for a single system arch
-  qemu = pkgs.qemu;
+  inherit qemu;
 
-  OVMF = pkgs.OVMF.override {
-    secureBoot = true;
-  };
+  OVMF = pkgs.OVMF.override { secureBoot = true; };
 
-  mkQemuFlags = extraFlags: [
-    "-enable-kvm"
-    "-cpu host"
-    "-smp ${cores}"
-    "-m ${qemuMem}"
-    "-M q35,smm=on"
-    "-vga qxl"
-    "-rtc base=${baseRtc}"
-    "-device qemu-xhci"
-    "-device virtio-net-pci,netdev=n1"
-  ] ++ pkgs.lib.optionals efi [
-    "-bios ${OVMF.fd}/FV/OVMF.fd"
-  ] ++ pkgs.lib.optionals enableTpm [
-    "-chardev" "socket,id=chrtpm,path=tpm.sock"
-    "-tpmdev" "emulator,id=tpm0,chardev=chrtpm"
-    "-device" "tpm-tis,tpmdev=tpm0"
-  ] ++ extraFlags;
+  mkQemuFlags = extraFlags:
+    [
+      "-enable-kvm"
+      "-cpu host"
+      "-smp ${cores}"
+      "-m ${qemuMem}"
+      "-M q35,smm=on"
+      "-vga qxl"
+      "-rtc base=${baseRtc}"
+      "-device qemu-xhci"
+      "-device virtio-net-pci,netdev=n1"
+    ] ++ pkgs.lib.optionals efi [ "-bios ${OVMF.fd}/FV/OVMF.fd" ]
+    ++ pkgs.lib.optionals enableTpm [
+      "-chardev"
+      "socket,id=chrtpm,path=tpm.sock"
+      "-tpmdev"
+      "emulator,id=tpm0,chardev=chrtpm"
+      "-device"
+      "tpm-tis,tpmdev=tpm0"
+    ] ++ extraFlags;
 
   tpmStartCommands = pkgs.lib.optionalString enableTpm ''
     mkdir -p tpmstate
@@ -41,12 +35,13 @@ rec {
   '';
 
   # Pass empty config file to prevent ssh from failing to create ~/.ssh
-  sshOpts = "-F /dev/null -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -o LogLevel=ERROR -o ConnectTimeout=1";
+  sshOpts =
+    "-F /dev/null -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -o LogLevel=ERROR -o ConnectTimeout=1";
   win-exec = pkgs.writeShellScriptBin "win-exec" ''
     set -e
     ${pkgs.sshpass}/bin/sshpass -p1234 -- \
       ${pkgs.openssh}/bin/ssh -np 2022 ${sshOpts} \
-      wfvm@localhost \
+      ''${SSHUSER:-wfvm}@localhost \
       $1
   '';
   win-wait = pkgs.writeShellScriptBin "win-wait" ''
@@ -95,28 +90,35 @@ rec {
       wfvm@localhost:$1 .
   '';
 
-  wfvm-run = { name, image, script, display ? false, isolateNetwork ? true, forwardedPorts ? [], fakeRtc ? true }:
+  wfvm-run = { name, image, script, display ? false, isolateNetwork ? true
+    , forwardedPorts ? [ ], fakeRtc ? true, qemu ? pkgs.qemu }:
     let
-      restrict =
-        if isolateNetwork
-        then "on"
-        else "off";
+      restrict = if isolateNetwork then "on" else "off";
       # use socat instead of `tcp:...` to allow multiple connections
-      guestfwds =
-        builtins.concatStringsSep ""
-        (map ({ listenAddr, targetAddr, port }:
-          ",guestfwd=tcp:${listenAddr}:${toString port}-cmd:${pkgs.socat}/bin/socat\\ -\\ tcp:${targetAddr}:${toString port}"
-        ) forwardedPorts);
-      qemuParams = mkQemuFlags (pkgs.lib.optional (!display) "-display none" ++ pkgs.lib.optional (!fakeRtc) "-rtc base=localtime" ++ [
-        "-drive"
-        "file=${image},index=0,media=disk,cache=unsafe"
-        "-snapshot"
-        "-netdev user,id=n1,net=192.168.1.0/24,restrict=${restrict},hostfwd=tcp::2022-:22${guestfwds}"
-      ]);
+      guestfwds = builtins.concatStringsSep "" (map
+        ({ listenAddr, targetAddr, port }:
+          ",guestfwd=tcp:${listenAddr}:${
+            toString port
+          }-cmd:${pkgs.socat}/bin/socat\\ -\\ tcp:${targetAddr}:${
+            toString port
+          }") forwardedPorts);
+      qemuParams = mkQemuFlags (pkgs.lib.optional (!display) "-display none"
+        ++ pkgs.lib.optional (!fakeRtc) "-rtc base=localtime" ++ [
+          "-drive"
+          "file=${image},index=0,media=disk,cache=unsafe"
+          "-snapshot"
+          "-netdev user,id=n1,net=192.168.47.0/24,restrict=${restrict},hostfwd=tcp::2022-:22,hostfwd=tcp::55055-:55055,hostfwd=tcp::55056-:55056,hostfwd=udp::55055-:55055,hostfwd=udp::55056-:55056${guestfwds},hostfwd=tcp::55088-:55088,hostfwd=tcp::55089-:55089,hostfwd=tcp::55090-:55090,hostfwd=tcp::55091-:55091,hostfwd=tcp::55092-:55092,hostfwd=tcp::55093-:55093,hostfwd=tcp::55094-:55094,hostfwd=tcp::55095-:55095,hostfwd=tcp::55096-:55096,hostfwd=tcp::55097-:55097,hostfwd=tcp::55098-:55098,hostfwd=tcp::55099-:55099"
+          #"-display default,show-cursor=on"
+          "-display none"
+        ]);
     in pkgs.writeShellScriptBin "wfvm-run-${name}" ''
       set -e -m
       ${tpmStartCommands}
-      ${qemu}/bin/qemu-system-x86_64 ${pkgs.lib.concatStringsSep " " qemuParams} &
+      ${qemu}/bin/qemu-system-x86_64 ${
+        pkgs.lib.concatStringsSep " " qemuParams
+      } &
+
+      export PATH=$PATH:${win-exec}/bin
 
       ${win-wait}/bin/win-wait
 
